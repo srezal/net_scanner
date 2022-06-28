@@ -12,7 +12,7 @@ def scan(ip):
     for element in answered_list:
         try:
             vendor = MacLookup().lookup(element[1].hwsrc)
-        except:
+        except KeyError:
             vendor = "UNDEFINED (Maybe APPLE)"
         clients_list.append({"ip" : element[1].psrc,
                              "mac" : element[1].hwsrc,
