@@ -1,5 +1,22 @@
 import scapy.all as scapy
 from mac_vendor_lookup import MacLookup
+import subprocess
+import optparse
+import re
+
+
+def get_arguments():
+    parser = optparse.OptionParser()
+    parser.add_option("-i", "--interface", dest="interface", help="Interface")
+    (options, arguments) = parser.parse_args()
+    if not options.interface:
+        parser.error("[-] Specify an Interface, use --help for more info")
+    return options
+
+
+def get_own_ip():
+    own_ip = re.search(r"\d+.\d+.\d+.\d+", subprocess.check_output(["ifconfig", options.interface]).decode())
+    return own_ip.group(0)
 
 
 def scan(ip):
@@ -26,8 +43,10 @@ def print_result(clients_list):
         print(client['ip'], client['mac'], client["vendor"])
 
 
+options = get_arguments()
+own_ip = get_own_ip()
 print("IP\t\t\t\tMAC address\t\t\t\tVendor\n" + "-"*60)
-clients_list, unanswered_list = scan("192.168.31.184/24")
+clients_list, unanswered_list = scan(f"{own_ip}/24")
 print_result(clients_list)
 while unanswered_list:
     clients_list, unanswered_list = scan(unanswered_list)
